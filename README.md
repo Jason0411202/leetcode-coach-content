@@ -74,12 +74,21 @@ Extension 預設讀取 `https://raw.githubusercontent.com/USER/leetcode-coach-co
 
 ```
 1. 上 https://claude.ai/code/routines
-2. New routine → 貼 docs/claude-scheduled-task.md §4 的 prompt
-3. Repo 選本 repo
-4. Trigger:Schedule / Daily / 09:00
-5. Permissions:✅ 勾「Allow unrestricted branch pushes」(讓 Claude 直接寫 main)
-6. Create → Run now 跑一次確認
+2. 建 Custom environment「leetcode-coach」,Network access = Custom,
+   Allowed domains 加:
+     alfa-leetcode-api.onrender.com
+     leetcode-api-pied.vercel.app
+     leetcode.com
+   (勾「Also include default list of common package managers」)
+3. New routine → 貼 docs/claude-scheduled-task.md §4 的 prompt
+4. Repo 選本 repo
+5. Environment 選步驟 2 建的「leetcode-coach」(不是 Default!)
+6. Trigger:Schedule / Daily / 09:00
+7. Permissions:✅ 勾「Allow unrestricted branch pushes」(讓 Claude 直接寫 main)
+8. Create → Run now 跑一次確認
 ```
+
+> ⚠️ **步驟 2 是最容易被卡住的一步。** Default environment 用 `Trusted` 網路 level,allowlist 不含 leetcode.com 與我們用的第三方 API,routine 跑起來會卡在「Host not in allowlist」。
 
 > ⚠️ 設定完之後,記得把這個 GitHub repo 設成 **Watching → Custom → Issues + Actions**。這樣只有 `auto-revert.yml` 真的攔到問題時才會通知你,日常成功 push 不會打擾。
 

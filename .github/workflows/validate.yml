@@ -1,0 +1,33 @@
+name: Validate Content
+
+on:
+  push:
+    branches: [main, "claude/**"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Validate problem schemas and manifest
+        run: node scripts/validate.mjs
+
+      - name: Verify no <script> or onclick in HTML fields
+        run: |
+          set -e
+          for f in problems/*.json; do
+            if grep -E '<script|on[a-z]+\s*=' "$f"; then
+              echo "::error file=$f::HTML must not contain <script> or on* attributes"
+              exit 1
+            fi
+          done
+          echo "All problem files passed safety check."

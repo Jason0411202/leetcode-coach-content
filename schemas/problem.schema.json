@@ -1,0 +1,82 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "LeetCode Coach Problem Content",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "slug",
+    "metadata",
+    "explanation_html",
+    "hints_html",
+    "solution_html"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$"
+    },
+    "metadata": {
+      "type": "object",
+      "required": [
+        "leetcode_id",
+        "title_en",
+        "title_zh",
+        "pattern",
+        "difficulty"
+      ],
+      "properties": {
+        "leetcode_id": { "type": "integer" },
+        "title_en": { "type": "string" },
+        "title_zh": { "type": "string" },
+        "leetcode_url": { "type": "string", "format": "uri" },
+        "pattern": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "hash-map",
+              "two-pointers",
+              "sliding-window",
+              "binary-search",
+              "stack",
+              "queue",
+              "linked-list",
+              "tree",
+              "graph",
+              "bfs",
+              "dfs",
+              "dp",
+              "greedy",
+              "backtracking",
+              "bit-manipulation",
+              "math",
+              "array",
+              "string",
+              "union-find",
+              "trie",
+              "heap"
+            ]
+          },
+          "minItems": 1
+        },
+        "difficulty": { "enum": ["easy", "medium", "hard"] },
+        "generated_at": { "type": "string", "format": "date" },
+        "generated_by": { "enum": ["claude", "manual"] }
+      }
+    },
+    "explanation_html": { "type": "string", "minLength": 1 },
+    "hints_html": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "minItems": 1,
+      "maxItems": 5
+    },
+    "solution_html": { "type": "string", "minLength": 1 },
+    "related_slugs": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[a-z0-9-]+$" }
+    }
+  },
+  "additionalProperties": false
+}

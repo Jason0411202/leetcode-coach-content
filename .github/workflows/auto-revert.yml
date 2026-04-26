@@ -1,0 +1,119 @@
+name: Auto-revert bad content
+
+# When validate.yml fails on main, this workflow:
+#   1. Pushes a `Revert "<original commit message>"` commit to main
+#   2. Opens an issue tagging the bad commit so the maintainer
+#      can adjust the routine prompt
+#
+# This is the safety net that lets Claude push directly to main
+# without human review — if anything bad slips through pre-push
+# validation, CI catches it and this workflow undoes it automatically.
+
+on:
+  workflow_run:
+    workflows: ["Validate Content"]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: write
+  issues: write
+  actions: read
+
+jobs:
+  revert:
+    if: ${{ github.event.workflow_run.conclusion == 'failure' && github.event.workflow_run.event == 'push' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main at HEAD
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Identify bad commit
+        id: bad
+        shell: bash
+        run: |
+          set -euo pipefail
+          BAD_SHA="${{ github.event.workflow_run.head_sha }}"
+          echo "bad_sha=$BAD_SHA" >> "$GITHUB_OUTPUT"
+          BAD_MSG=$(git log -1 --pretty=%s "$BAD_SHA")
+          BAD_AUTHOR=$(git log -1 --pretty=%an "$BAD_SHA")
+          BAD_AUTHOR_EMAIL=$(git log -1 --pretty=%ae "$BAD_SHA")
+          {
+            echo "bad_msg<<EOF"
+            echo "$BAD_MSG"
+            echo "EOF"
+            echo "bad_author=$BAD_AUTHOR"
+            echo "bad_author_email=$BAD_AUTHOR_EMAIL"
+          } >> "$GITHUB_OUTPUT"
+          echo "::notice title=Auto-revert::Reverting $BAD_SHA ('$BAD_MSG') by $BAD_AUTHOR"
+
+      - name: Guard - is HEAD still the bad commit?
+        id: guard
+        shell: bash
+        run: |
+          set -euo pipefail
+          HEAD_SHA=$(git rev-parse HEAD)
+          if [ "$HEAD_SHA" != "${{ steps.bad.outputs.bad_sha }}" ]; then
+            echo "main has moved past ${{ steps.bad.outputs.bad_sha }} (now $HEAD_SHA)."
+            echo "Skipping auto-revert — assume the maintainer or a follow-up commit already addressed it."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Configure git identity
+        if: steps.guard.outputs.skip == 'false'
+        run: |
+          git config user.name "leetcode-coach-bot"
+          git config user.email "bot@users.noreply.github.com"
+
+      - name: Revert the bad commit
+        if: steps.guard.outputs.skip == 'false'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git revert --no-edit "${{ steps.bad.outputs.bad_sha }}"
+          git push origin main
+
+      - name: Open issue with details
+        if: steps.guard.outputs.skip == 'false'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const badSha = '${{ steps.bad.outputs.bad_sha }}';
+            const badMsg = `${{ steps.bad.outputs.bad_msg }}`;
+            const badAuthor = '${{ steps.bad.outputs.bad_author }}';
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${{ github.event.workflow_run.id }}`;
+            const body = [
+              `## Auto-reverted commit \`${badSha.slice(0, 7)}\``,
+              ``,
+              `The validation workflow failed on \`main\` after this push, so \`auto-revert.yml\` has pushed a revert commit.`,
+              ``,
+              `### Bad commit`,
+              `- SHA: \`${badSha}\``,
+              `- Message: ${badMsg}`,
+              `- Author: ${badAuthor}`,
+              ``,
+              `### What you should do`,
+              `1. Look at the failed CI run: ${runUrl}`,
+              `2. Identify which validation rule failed (schema, HTML safety, manifest consistency, etc.)`,
+              `3. Update the routine prompt in [docs/claude-scheduled-task.md](../blob/main/docs/claude-scheduled-task.md) §4 to prevent recurrence`,
+              `4. Close this issue once the prompt is updated`,
+              ``,
+              `### What you do NOT need to do`,
+              `- Manually revert anything — already done.`,
+              `- Notify users — extension's 24h cache means most existing users never saw the bad commit.`,
+              ``,
+              `_This issue was opened automatically by \`.github/workflows/auto-revert.yml\`._`
+            ].join('\n');
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `[auto-revert] ${badMsg}`,
+              body,
+              labels: ['auto-revert', 'content']
+            });

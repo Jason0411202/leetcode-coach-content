@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "updated_at": "2026-04-26T01:00:00Z",
+  "problems": [
+    {
+      "slug": "two-sum",
+      "leetcode_id": 1,
+      "title_en": "Two Sum",
+      "pattern": ["hash-map", "array"],
+      "difficulty": "easy",
+      "added_at": "2026-04-26"
+    },
+    {
+      "slug": "valid-parentheses",
+      "leetcode_id": 20,
+      "title_en": "Valid Parentheses",
+      "pattern": ["stack", "string"],
+      "difficulty": "easy",
+      "added_at": "2026-04-26"
+    }
+  ]
+}

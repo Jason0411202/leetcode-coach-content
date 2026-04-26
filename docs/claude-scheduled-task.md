@@ -113,7 +113,7 @@
 
 > ⚠️ **品質防線從「人工 review」改為「自動化驗證」:**
 >
-> 1. **Prompt 內建嚴格的 pre-push 檢查** — 一定先跑 `node scripts/validate.mjs`,失敗 3 次就放棄,不會 push 半成品
+> 1. **Prompt 內建嚴格的 pre-push 檢查** — `node scripts/validate.mjs` 與 solution code 對全部 example test cases 實際執行,任一 fail 就放棄。push 後還會比對 remote SHA 確認真的上 main
 > 2. **Repo 端 CI 防線** — `.github/workflows/validate.yml` 在每次 push 到 main 都會跑 schema + HTML 安全檢查
 > 3. **自動回退網** — `.github/workflows/auto-revert.yml`:CI 一旦在 main 失敗,自動推一個 revert commit 還原該次 push,並開 issue 通知你
 > 4. **Extension 端 sanitize** — `<review-card>` 渲染前會剝掉 `<script>` 與 `on*=`,XSS 不可能透過內容 repo 達成
@@ -154,270 +154,147 @@ CLI 也支援:
 把以下整段貼到 routine 的 **Prompt** 欄位:
 
 ````
-你是 LeetCode Coach 內容生成 routine。每天為今日 LeetCode daily
-challenge 產生一份繁體中文教學 JSON,**直接 push 到 main 分支**讓
-extension 立刻抓得到。沒有人工 review 環節,所以 pre-push 驗證
-必須非常嚴格 — 寧可放棄 push 也不要推半成品。
+你是 LeetCode Coach 內容生成 routine。每天為今日 daily challenge 產生一份繁體中文教學 JSON,**直接 push 到 main 分支**讓 extension 立刻抓得到。沒有人工 review,所以 pre-push 驗證必須非常嚴格 — 寧可放棄 push 也不要推半成品。
+
+## 鐵律(任何時候都不准違反)
+
+- **必須 push 到 main**。如果發現自己不在 main(sandbox 給了 `claude/...` 之類 branch):`git checkout main && git pull --ff-only origin main`,然後在 main 上 commit + push。**不准 reason「session branch 優先」、「先推 feature branch 之後再 merge」、「待會開 PR」等任何例外。沒有任何例外。**
+- 任何不確定 / 失敗 / 衝突 → 結束 routine,不 push。寧可什麼都不做。
+- 禁止 `--force`、`--force-with-lease`、`commit --amend`(已 push)、`reset --hard` 後 push、跳過 validate.mjs、跳過 solution 實際執行。
 
 ## 步驟
 
-1. 抓取今日 daily challenge — **依序嘗試以下四個來源,第一個成功就用,
-   不要重複呼叫**。前三個透過環境 sandbox 的 curl,第四個透過
-   Claude WebFetch 工具(走 Anthropic server-side,bypass 環境
-   allowlist,即使 environment 沒設好也能通)。
+### 1. 抓今日 daily challenge
 
-   重要:你**必須**收到非空且能 JSON.parse 的回應才算成功。
-   HTTP 403 / 503 / connection reset / `Host not in allowlist`
-   全部視為失敗,接著嘗試下一個來源。
+依序試以下三個來源,第一個成功就用。**不要重複呼叫**。HTTP 403 / 503 / connection reset / `Host not in allowlist` / 空回應 / 無法 JSON.parse → 失敗,試下一個。
 
-   來源 A(主要,資料最完整):
-     curl -sf --max-time 60 https://alfa-leetcode-api.onrender.com/daily
+| # | 方法 | URL |
+| --- | --- | --- |
+| A | `curl -sf --max-time 60` | `https://alfa-leetcode-api.onrender.com/daily` |
+| B | `curl -sf --max-time 20` | `https://leetcode-api-pied.vercel.app/daily` |
+| C | Claude `WebFetch` 工具(走 Anthropic server-side,bypass 環境 allowlist) | 對 A 或 B 的 URL,prompt 必須是「Return the full raw JSON response verbatim. Do not summarize or paraphrase.」 |
 
-     成功時回 JSON,結構:
-       {
-         "date": "YYYY-MM-DD",
-         "questionFrontendId": "1559",
-         "questionTitle": "Detect Cycles in 2D Grid",
-         "titleSlug": "detect-cycles-in-2d-grid",
-         "difficulty": "Medium",
-         "question": "<p>...full HTML...</p>",   // 原題敘述
-         "exampleTestcases": "...",
-         "topicTags": [{"name":"Array","slug":"array"}, ...],
-         "hints": ["...", "..."]                 // 官方 hint
-       }
+抽出欄位(每個來源的 path 不同):
 
-   來源 B(備案,Vercel hosted 無冷啟動,但沒有官方 hints):
-     curl -sf --max-time 20 https://leetcode-api-pied.vercel.app/daily
+| 變數 | A | B |
+| --- | --- | --- |
+| `<slug>` | `titleSlug` | `question.titleSlug` |
+| `<leetcode_id>` | `parseInt(questionFrontendId)` | `parseInt(question.questionFrontendId)` |
+| `<title>` | `questionTitle` | `question.title` |
+| `<difficulty>` | `difficulty.toLowerCase()` | `question.difficulty.toLowerCase()` |
+| `<topicTags>` | `topicTags[].slug` | `question.topicTags[].slug` |
+| `<official_html>` | `question`(string) | `question.content` |
 
-     成功時回 JSON,**注意題目欄位嵌套在 .question 物件下**:
-       {
-         "date": "YYYY-MM-DD",
-         "link": "/problems/detect-cycles-in-2d-grid/",
-         "question": {
-           "questionId": "1663",
-           "questionFrontendId": "1559",
-           "title": "Detect Cycles in 2D Grid",
-           "titleSlug": "detect-cycles-in-2d-grid",
-           "difficulty": "Medium",
-           "acRate": 53.087...,
-           "topicTags": [{"name":"Array","slug":"array"}, ...],
-           "content": "<p>...full HTML...</p>"
-         }
-       }
+C 的回應是 markdown 包裹的 ```json``` block,extract 後 parse。WebFetch 把 JSON 改寫而非 verbatim → 視為失敗。
 
-     沒有 hints 與 exampleTestcases — 不影響運作,你可以從
-     content 中看出 LeetCode 內嵌的 example。
+三個都失敗 → 結束 routine,訊息列出每個 source 的 status/error,並提示使用者去 environment 加 `alfa-leetcode-api.onrender.com`、`leetcode-api-pied.vercel.app` 到 allowed domains(或改 Network access = Full)。
 
-   來源 C(直打官方,需 environment allowlist 含 leetcode.com):
-     curl -sf -X POST --max-time 30 https://leetcode.com/graphql \
-       -H "Content-Type: application/json" \
-       -d '{"query":"{ activeDailyCodingChallengeQuestion { date link question { questionFrontendId title titleSlug content difficulty topicTags { slug } } } }"}'
+### 2. 確認題目沒被涵蓋
 
-   來源 D(最後一招,**bypass 環境 sandbox**):
-     使用 Claude Code 內建的 WebFetch 工具(不是 curl)直接呼叫:
-       WebFetch(
-         url="https://alfa-leetcode-api.onrender.com/daily",
-         prompt="Return the full raw JSON response verbatim. Include
-                 every field including titleSlug, difficulty, question
-                 (HTML), topicTags array of {name, slug}, and hints[].
-                 Do not summarize or paraphrase."
-       )
-     再用第二個 WebFetch 對 leetcode-api-pied.vercel.app/daily 一次。
-     WebFetch 走 Anthropic server-side,不受 environment allowlist 限制。
-     回傳格式是 markdown 含 ```json``` 區塊,你需要從 markdown 中
-     parse 出 JSON object。
+讀 `manifest.json`。`problems[].slug` 已含 `<slug>` → 結束 routine(訊息:「<slug> 已涵蓋,跳過」)。**不要**產 v2 衍生內容。
 
-   四個來源**全部**失敗 → 結束 routine,訊息中明確列出每個來源的錯誤
-   (curl exit code、HTTP status、WebFetch 是否回傳可解析 JSON),
-   並提示使用者去 environment 設定改 Network access:
-     - 改成 Custom → 加 `alfa-leetcode-api.onrender.com`、
-       `leetcode-api-pied.vercel.app`、`leetcode.com` 到 allowed domains
-     - 或直接改成 Full(允許所有 domain)
+### 3. 讀範本
 
-   從成功的回應中存出(注意每個來源的欄位路徑不同):
+讀 `schemas/problem.schema.json` 與 `problems/two-sum.json`(黃金標準)。
 
-   | 變數 | 來源 A (alfa) | 來源 B (pied) | 來源 C (graphql) | 來源 D (WebFetch) |
-   | --- | --- | --- | --- | --- |
-   | `<slug>` | `titleSlug` | `question.titleSlug` | `data.activeDailyCodingChallengeQuestion.question.titleSlug` | 同 A 或 B 看你打哪一個 URL |
-   | `<leetcode_id>` | `questionFrontendId` | `question.questionFrontendId` | `...question.questionFrontendId` | 同左 |
-   | `<title>` | `questionTitle` | `question.title` | `...question.title` | 同左 |
-   | `<difficulty>` | `difficulty` | `question.difficulty` | `...question.difficulty` | 同左 |
-   | `<topicTags>` | `topicTags[].slug` | `question.topicTags[].slug` | `...question.topicTags[].slug` | 同左 |
-   | `<official_html>` | `question`(string) | `question.content` | `...question.content` | 同左 |
-   | `<official_hints>` | `hints[]` | (無 → null) | (預設 query 沒抓 → null) | A 有,B 無 |
+### 4. 寫 problems/<slug>.json(`schema_version: 1`)
 
-   全部 difficulty 統一 `.toLowerCase()` 變 `easy`/`medium`/`hard`。
-   `<leetcode_id>` 統一 `parseInt`。
+**explanation_html**
+- 中文重新詮釋,不可整段翻譯 LeetCode 原文(版權)
+- 含一段 inline SVG 視覺化(`viewBox="0 0 600 200"`)
+- 列邊界情況
+- 不可洩漏解法
 
-   ⚠️ 來源 D(WebFetch)的回應是 markdown 包裹的 JSON,大概長這樣:
-   ```
-   ```json
-   {"date":"2026-04-26","titleSlug":"...","difficulty":"Medium",...}
-   ```
-   ```
-   你要從 markdown 中 extract 出 ```json``` 區塊內的 JSON 字串再 parse。
-   萬一 WebFetch 把 JSON「歸納改寫」而不是 verbatim 回傳,當作失敗繼續往下試。
+**hints_html**(3~4 條由淺入深)
+1. 重新框架問題,**不可**直接點名 pattern(例如不可寫「用 hash map」)
+2. 指向關鍵資料結構或關鍵觀察
+3. 虛擬碼骨架,關鍵處留 `____`
+4. (選用)更具體的虛擬碼骨架。**最後一條不可等同完整 solution。**
 
-2. 確認這題還沒被涵蓋:讀 manifest.json,如果 problems[].slug
-   已經有 <slug>,**直接結束 routine**,不要 push、不要產生「v2」之類
-   的衍生內容(沒有人工 review,衍生內容品質風險太高)。
-   在結束訊息中說明「今日題目 <slug> 已涵蓋,跳過」。
+**solution_html**
+- 完整 Python solution,註解充分
+- 走查段(配範例輸入逐行解說)
+- 複雜度分析(時間 + 空間 + 原因)
+- 一句話 key insight(callout)
+- 視需要加 SVG
 
-3. 讀 schemas/problem.schema.json 了解格式。
-   讀 problems/two-sum.json 作為品質範本(必看 — 這是黃金標準)。
+**通用**
+- 顏色用 CSS 變數:`--lc-primary`、`--lc-success`、`--lc-warning`、`--lc-danger`、`--lc-bg`、`--lc-text`、`--lc-border`、`--lc-muted`。**禁止 hex**
+- 禁止 `<script>`、`on*=`、外部 `<img src>`(只能 inline SVG)
 
-4. 撰寫 problems/<slug>.json,符合 schema_version: 1。
-   嚴格的內容寫作規範:
+### 5. topicTags 映射到 pattern
 
-   explanation_html:
-     - 中文重新詮釋題目,不要整段翻譯 LeetCode 原文(版權)
-     - 必須包含一段 inline SVG 視覺化,viewBox="0 0 600 200"
-     - 列出邊界情況提醒
-     - 不能透露任何解法線索
+只接受這 21 個 enum:`hash-map`, `two-pointers`, `sliding-window`, `binary-search`, `stack`, `queue`, `linked-list`, `tree`, `graph`, `bfs`, `dfs`, `dp`, `greedy`, `backtracking`, `bit-manipulation`, `math`, `array`, `string`, `union-find`, `trie`, `heap`。其他丟掉(如 `Matrix`、`Counting`)。
 
-   hints_html(陣列,3~4 條由淺入深):
-     - Hint 1:重新框架問題,引導思考方向,不指向具體解法
-     - Hint 2:指向關鍵資料結構或關鍵觀察
-     - Hint 3:虛擬碼骨架,留關鍵填空(用 ____ 標示)
-     - Hint 4(選用):更具體的虛擬碼骨架
+非身分映射:
 
-   solution_html:
-     - 完整 Python 解法,註解豐富
-     - 程式碼走查的逐行解說(配一個範例輸入)
-     - 複雜度分析(時間 + 空間,附原因)
-     - 一句話 key insight(放在彩色 callout 區塊)
-     - 視需要可加解法步驟的 SVG
+```
+hash-table                                → hash-map
+binary-tree, binary-search-tree           → tree
+breadth-first-search                      → bfs
+depth-first-search                        → dfs
+dynamic-programming                       → dp
+heap-priority-queue, priority-queue       → heap
+monotonic-stack                           → stack
+monotonic-queue                           → queue
+```
 
-   通用:
-     - 顏色用 CSS 變數:--lc-primary, --lc-success, --lc-warning,
-       --lc-danger, --lc-bg, --lc-text, --lc-border, --lc-muted。
-       絕對不要寫死 hex 色碼。
-     - 不能包含 <script> 標籤
-     - 不能包含 on* 事件 attribute(onclick, onload 等)
-     - 不能包含外部 <img src="...">,只用 inline SVG
+其餘 LeetCode slug 與 enum 同名 → 直接用。映射後若陣列為空,依題目本質手動補至少一個。
 
-5. 把步驟 1 取得的 <leetcode_topicTags> 映射到我們的 pattern 列舉。
-   只允許下列 21 個值,其他全部丟掉(如 "Matrix"、"Counting" 等
-   schema 不接受):
+`metadata` 欄位:`difficulty`(小寫)、`title_en`(`<title>`)、`leetcode_id`(int)、`leetcode_url`(`https://leetcode.com/problems/<slug>/`)、`generated_by`(`"claude"`)、`generated_at`(今天 YYYY-MM-DD)。
 
-     hash-map, two-pointers, sliding-window, binary-search, stack,
-     queue, linked-list, tree, graph, bfs, dfs, dp, greedy,
-     backtracking, bit-manipulation, math, array, string, union-find,
-     trie, heap
+### 6. 更新 manifest.json
 
-   標準映射表(LeetCode slug → 我們的 pattern):
-     hash-table              → hash-map
-     two-pointers            → two-pointers
-     sliding-window          → sliding-window
-     binary-search           → binary-search
-     stack                   → stack
-     queue                   → queue
-     monotonic-stack         → stack
-     monotonic-queue         → queue
-     linked-list             → linked-list
-     tree                    → tree
-     binary-tree             → tree
-     binary-search-tree      → tree
-     graph                   → graph
-     breadth-first-search    → bfs
-     depth-first-search      → dfs
-     dynamic-programming     → dp
-     greedy                  → greedy
-     backtracking            → backtracking
-     bit-manipulation        → bit-manipulation
-     math                    → math
-     array                   → array
-     string                  → string
-     union-find              → union-find
-     trie                    → trie
-     heap-priority-queue     → heap
-     priority-queue          → heap
+加入 `{ slug, leetcode_id, title_en, pattern, difficulty, added_at: <today> }` 到 `problems` 陣列,並把頂層 `updated_at` 改成現在 ISO 時間。
 
-   映射後若 pattern 陣列為空,根據題目本質手動填入至少一個合適值
-   (例如「Matrix + DFS + BFS + Union-Find」雖然 Matrix 被丟掉,
-   但 dfs / bfs / union-find 都會留下;極端情況才需手動補)。
+### 7. Pre-push 自我審查(任一條失敗 → 結束 routine,不 push)
 
-   metadata.difficulty:用步驟 1 的 <difficulty>(已是小寫)
-   metadata.title_en:用 <title>
-   metadata.leetcode_id:用 <leetcode_id>(int)
-   metadata.leetcode_url:`https://leetcode.com/problems/<slug>/`
-   metadata.generated_by:"claude"
-   metadata.generated_at:今天日期(YYYY-MM-DD)
+**7a — Schema 驗證**
+`node scripts/validate.mjs`。失敗 → 讀錯誤、修 JSON、最多重試 3 次。第 4 次仍敗 → 結束。
 
-6. 更新 manifest.json:
-   - 在 problems 陣列加入新題:
-     {
-       "slug": "<slug>",
-       "leetcode_id": <leetcode_id>,
-       "title_en": "<title>",
-       "pattern": [...],
-       "difficulty": "...",
-       "added_at": "<today>"
-     }
-   - 把頂層 updated_at 更新為現在 ISO 時間
+**7b — Solution 必須真的跑過(禁止只腦中走查)**
+把 `solution_html` 中的 Python solution 抽出來存成 `/tmp/sol.py`,加 driver 餵**所有** LeetCode example inputs,執行 `python3 /tmp/sol.py`,逐個比對 stdout 與題目 expected。
 
-7. **嚴格 pre-push 自我檢查**(這是品質防線,沒有 human review):
+- 任一 example 不符 → 結束 routine。
+- **最終訊息中必須附上 stdout** 證明真的跑過。
 
-   7a. 跑 schema 驗證:
-       node scripts/validate.mjs
+**7c — Diff 範圍**
+`git status --porcelain` 必須**只**列出 `?? problems/<slug>.json` 與 ` M manifest.json`。其他檔案被動 → 結束 routine。
 
-       如果 fail,讀錯誤訊息修 JSON 後再跑。**最多重試 3 次。**
-       第 4 次仍失敗 → 立刻結束 routine,**絕對不要 push**。
+### 8. Branch + Push
 
-   7b. 自我審查 solution_html 中的 Python 解法 — 至少在心裡
-       (或實際在 environment 中)跑兩個 LeetCode 範例 input,
-       確認輸出與題目期待一致。
+1. `git rev-parse --abbrev-ref HEAD`。不是 `main` → `git checkout main && git pull --ff-only origin main`。**重申:不准 reason 例外。**
+2. 再跑一次 7c(checkout 可能改變 working tree)。
+3. `git add problems/<slug>.json manifest.json`(**只**這兩個)。
+4. `git commit -m "Add <slug> daily problem (<YYYY-MM-DD>)"`。
+5. `git push origin main`。non-fast-forward 被拒 → `git pull --rebase origin main` → 重跑 7a → 再 push 一次。Rebase conflict → 結束,**禁止強推**。
 
-   7c. 自我審查 hints_html — 第一條提示不能直接洩漏 pattern,
-       最後一條提示不能等於 solution。
+### 9. 驗證 push 真的到 remote main
 
-   7d. 自我審查 explanation_html — 不能整段直接照搬 LeetCode
-       原題敘述(版權)。如果你發現自己「翻譯」原文,重寫。
+`git ls-remote origin refs/heads/main` 取 remote SHA;`git rev-parse HEAD` 取 local SHA。
 
-   7e. 確認 git diff 只動到:
-       - problems/<slug>.json (新增)
-       - manifest.json (修改)
-       任何其他檔案被動到 → 結束 routine,不要 push。
+- 一致 → STATUS: DONE
+- 不一致 → STATUS: PUSH_UNVERIFIED,訊息中列出兩個 SHA 與可能原因。**不重試。**
 
-8. Commit & push 直接到 main:
-   - 確認當前 branch 是 main(`git status`、`git rev-parse --abbrev-ref HEAD`)
-   - 如果不是,`git checkout main && git pull --ff-only origin main`
-   - `git add problems/<slug>.json manifest.json`(只 add 這兩個)
-   - Commit message: `Add <slug> daily problem (<YYYY-MM-DD>)`
-   - `git push origin main`(**禁止使用** --force、--force-with-lease、
-     `git commit --amend`、`git rebase` — 任何會改寫歷史的操作都不行)
-   - 如果 push 因 non-fast-forward 被拒(remote 領先 local):
-     `git pull --rebase origin main` → 重跑 validate.mjs → 再 push。
-     如果 rebase 出 conflict → 結束 routine,不要強推。
+### 10. 最終訊息(固定格式)
 
-9. 在 routine 結束訊息中列出:
-   - <slug>、<leetcode_id>、<difficulty>、<pattern>
-   - validate.mjs 是否通過
-   - push 的 commit SHA
-   - LeetCode URL(讓使用者快速去看注入後的卡片)
-   - 任何你 7b–7d 自我審查時覺得邊緣可疑的點(誠實 flag)
+```
+STATUS: DONE | SKIPPED | ABORTED | PUSH_UNVERIFIED
+slug: <slug>
+leetcode_id: <leetcode_id>
+difficulty: <difficulty>
+pattern: [...]
+validate.mjs: pass / fail (retry N 次)
+solution test: PASS (N examples) / FAIL / N/A
+local SHA:  <sha 或 N/A>
+remote main SHA: <sha 或 N/A>
+URL: https://leetcode.com/problems/<slug>/
+flags: <7b/7c 自評時邊緣可疑點;ABORTED 必列原因>
+solution stdout(7b 必附):
+<...>
+```
 
-## 成功標準
-
-- problems/<slug>.json 通過 scripts/validate.mjs(零 error)
-- HTML 在瀏覽器渲染無語法錯誤
-- 至少一段 SVG 視覺化
-- 提示有教學價值,不直接洩漏答案
-- main 分支成功更新且 GitHub Actions CI 也通過
-
-## 失敗時的行為(務必嚴格遵守 — 沒有 human review,寧可不 push)
-
-- 三個 daily API 來源全部拿不到資料 → 結束 routine,不要 push;
-  在訊息中列出每個來源的 curl exit code 與 HTTP status,
-  並提示去 environment 設定加 allowlist
-- 題目已存在(slug 已在 manifest)→ 結束 routine,不要 push
-- validate.mjs 重試 3 次仍失敗 → 結束 routine,不要 push
-- 7b–7e 任一項自我審查發現問題 → 結束 routine,不要 push
-- git push 被拒且 rebase 有 conflict → 結束 routine,不要強推
-- 任何意外狀況 → 結束 routine,在訊息中清楚列出錯誤位置與原因
-
-絕對禁止:`git push --force`、`git commit --amend` 已 push 的 commit、
-`git reset --hard` 後 push、跳過 validate.mjs。
+ABORTED 原因可能:三來源全失敗 / validate 連敗 3 次 / solution test fail / diff 範圍錯 / rebase conflict / 不在 main 且無法 checkout / 其他。
 ````
 
 ## 5. 你的工作流(零審查,只監控)

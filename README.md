@@ -58,8 +58,8 @@ Extension 預設讀取 `https://raw.githubusercontent.com/USER/leetcode-coach-co
 
 | 章節 | 內容 |
 | --- | --- |
-| §0 | 前置條件(訂閱方案、GitHub 連結) |
-| §1 | 連結 GitHub 帳號(`/web-setup`) |
+| §0 | 前置條件(訂閱方案、Claude Code GitHub App) |
+| §1 | 連結 GitHub:`/web-setup` + 安裝 GitHub App 給 `Contents: write` |
 | §2 | Web 介面建立 routine 的逐步操作(7 步) |
 | §3 | 從 CLI 用 `/schedule` 建立(替代方案) |
 | §4 | **完整可貼上的 prompt**(數百行,涵蓋寫作規範與失敗處理) |
@@ -73,6 +73,9 @@ Extension 預設讀取 `https://raw.githubusercontent.com/USER/leetcode-coach-co
 ### 一句話 TL;DR
 
 ```
+0. 安裝 Claude Code GitHub App:https://github.com/settings/installations
+   → Configure → Repository access 加本 repo
+   → Permissions 必須含 Contents: Read and write(只裝 PR 留言版的不夠!)
 1. 上 https://claude.ai/code/routines
 2. 建 Custom environment「leetcode-coach」,Network access = Custom,
    Allowed domains 加:
@@ -88,7 +91,9 @@ Extension 預設讀取 `https://raw.githubusercontent.com/USER/leetcode-coach-co
 8. Create → Run now 跑一次確認
 ```
 
-> ⚠️ **步驟 2 是最容易被卡住的一步。** Default environment 用 `Trusted` 網路 level,allowlist 不含 leetcode.com 與我們用的第三方 API,routine 跑起來會卡在「Host not in allowlist」。
+> ⚠️ **最常卡關的兩個地方:**
+> - **步驟 0**(GitHub App `Contents: write`)— 沒給 push 會回 `403 from 127.0.0.1:<port>/git/...`,看起來像 sandbox 問題,實際是 GitHub auth 不夠
+> - **步驟 2**(Custom environment + allowlist)— Default `Trusted` allowlist 不含 leetcode 系 host,routine 會卡在 `Host not in allowlist`
 
 > ⚠️ 設定完之後,記得把這個 GitHub repo 設成 **Watching → Custom → Issues + Actions**。這樣只有 `auto-revert.yml` 真的攔到問題時才會通知你,日常成功 push 不會打擾。
 

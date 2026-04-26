@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-04-26T01:00:00Z",
+  "updated_at": "2026-04-26T06:00:00Z",
   "problems": [
     {
       "slug": "two-sum",
@@ -16,6 +16,14 @@
       "title_en": "Valid Parentheses",
       "pattern": ["stack", "string"],
       "difficulty": "easy",
+      "added_at": "2026-04-26"
+    },
+    {
+      "slug": "detect-cycles-in-2d-grid",
+      "leetcode_id": 1559,
+      "title_en": "Detect Cycles in 2D Grid",
+      "pattern": ["dfs", "bfs", "union-find", "array"],
+      "difficulty": "medium",
       "added_at": "2026-04-26"
     }
   ]

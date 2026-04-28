@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-04-27T00:00:00Z",
+  "updated_at": "2026-04-28T00:00:00Z",
   "problems": [
     {
       "slug": "two-sum",
@@ -33,6 +33,14 @@
       "pattern": ["array", "dfs", "bfs", "union-find"],
       "difficulty": "medium",
       "added_at": "2026-04-27"
+    },
+    {
+      "slug": "minimum-operations-to-make-a-uni-value-grid",
+      "leetcode_id": 2033,
+      "title_en": "Minimum Operations to Make a Uni-Value Grid",
+      "pattern": ["array", "math"],
+      "difficulty": "medium",
+      "added_at": "2026-04-28"
     }
   ]
 }

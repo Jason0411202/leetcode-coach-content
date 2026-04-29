@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-04-28T00:00:00Z",
+  "updated_at": "2026-04-29T00:00:00Z",
   "problems": [
     {
       "slug": "two-sum",
@@ -41,6 +41,14 @@
       "pattern": ["array", "math"],
       "difficulty": "medium",
       "added_at": "2026-04-28"
+    },
+    {
+      "slug": "maximum-score-from-grid-operations",
+      "leetcode_id": 3225,
+      "title_en": "Maximum Score From Grid Operations",
+      "pattern": ["dp", "array"],
+      "difficulty": "hard",
+      "added_at": "2026-04-29"
     }
   ]
 }

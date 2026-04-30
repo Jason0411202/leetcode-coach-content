@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-04-29T00:00:00Z",
+  "updated_at": "2026-04-30T00:00:00Z",
   "problems": [
     {
       "slug": "two-sum",
@@ -49,6 +49,14 @@
       "pattern": ["dp", "array"],
       "difficulty": "hard",
       "added_at": "2026-04-29"
+    },
+    {
+      "slug": "maximum-path-score-in-a-grid",
+      "leetcode_id": 3742,
+      "title_en": "Maximum Path Score in a Grid",
+      "pattern": ["dp", "array"],
+      "difficulty": "medium",
+      "added_at": "2026-04-30"
     }
   ]
 }

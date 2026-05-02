@@ -1,12 +1,15 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-01T00:00:00Z",
+  "updated_at": "2026-05-02T00:42:21Z",
   "problems": [
     {
       "slug": "two-sum",
       "leetcode_id": 1,
       "title_en": "Two Sum",
-      "pattern": ["hash-map", "array"],
+      "pattern": [
+        "hash-map",
+        "array"
+      ],
       "difficulty": "easy",
       "added_at": "2026-04-26"
     },
@@ -14,7 +17,10 @@
       "slug": "valid-parentheses",
       "leetcode_id": 20,
       "title_en": "Valid Parentheses",
-      "pattern": ["stack", "string"],
+      "pattern": [
+        "stack",
+        "string"
+      ],
       "difficulty": "easy",
       "added_at": "2026-04-26"
     },
@@ -22,7 +28,12 @@
       "slug": "detect-cycles-in-2d-grid",
       "leetcode_id": 1559,
       "title_en": "Detect Cycles in 2D Grid",
-      "pattern": ["dfs", "bfs", "union-find", "array"],
+      "pattern": [
+        "dfs",
+        "bfs",
+        "union-find",
+        "array"
+      ],
       "difficulty": "medium",
       "added_at": "2026-04-26"
     },
@@ -30,7 +41,12 @@
       "slug": "check-if-there-is-a-valid-path-in-a-grid",
       "leetcode_id": 1391,
       "title_en": "Check if There is a Valid Path in a Grid",
-      "pattern": ["array", "dfs", "bfs", "union-find"],
+      "pattern": [
+        "array",
+        "dfs",
+        "bfs",
+        "union-find"
+      ],
       "difficulty": "medium",
       "added_at": "2026-04-27"
     },
@@ -38,7 +54,10 @@
       "slug": "minimum-operations-to-make-a-uni-value-grid",
       "leetcode_id": 2033,
       "title_en": "Minimum Operations to Make a Uni-Value Grid",
-      "pattern": ["array", "math"],
+      "pattern": [
+        "array",
+        "math"
+      ],
       "difficulty": "medium",
       "added_at": "2026-04-28"
     },
@@ -46,7 +65,10 @@
       "slug": "maximum-score-from-grid-operations",
       "leetcode_id": 3225,
       "title_en": "Maximum Score From Grid Operations",
-      "pattern": ["dp", "array"],
+      "pattern": [
+        "dp",
+        "array"
+      ],
       "difficulty": "hard",
       "added_at": "2026-04-29"
     },
@@ -54,7 +76,10 @@
       "slug": "maximum-path-score-in-a-grid",
       "leetcode_id": 3742,
       "title_en": "Maximum Path Score in a Grid",
-      "pattern": ["dp", "array"],
+      "pattern": [
+        "dp",
+        "array"
+      ],
       "difficulty": "medium",
       "added_at": "2026-04-30"
     },
@@ -62,9 +87,24 @@
       "slug": "rotate-function",
       "leetcode_id": 396,
       "title_en": "Rotate Function",
-      "pattern": ["array", "math", "dp"],
+      "pattern": [
+        "array",
+        "math",
+        "dp"
+      ],
       "difficulty": "medium",
       "added_at": "2026-05-01"
+    },
+    {
+      "slug": "rotated-digits",
+      "leetcode_id": 788,
+      "title_en": "Rotated Digits",
+      "pattern": [
+        "math",
+        "dp"
+      ],
+      "difficulty": "medium",
+      "added_at": "2026-05-02"
     }
   ]
 }

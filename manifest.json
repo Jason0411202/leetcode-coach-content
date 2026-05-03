@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-02T00:42:21Z",
+  "updated_at": "2026-05-03T00:00:00Z",
   "problems": [
     {
       "slug": "two-sum",
@@ -105,6 +105,16 @@
       ],
       "difficulty": "medium",
       "added_at": "2026-05-02"
+    },
+    {
+      "slug": "rotate-string",
+      "leetcode_id": 796,
+      "title_en": "Rotate String",
+      "pattern": [
+        "string"
+      ],
+      "difficulty": "easy",
+      "added_at": "2026-05-03"
     }
   ]
 }

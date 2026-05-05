@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-04T00:00:00Z",
+  "updated_at": "2026-05-05T00:00:00Z",
   "problems": [
     {
       "slug": "two-sum",
@@ -126,6 +126,17 @@
       ],
       "difficulty": "medium",
       "added_at": "2026-05-04"
+    },
+    {
+      "slug": "rotate-list",
+      "leetcode_id": 61,
+      "title_en": "Rotate List",
+      "pattern": [
+        "linked-list",
+        "two-pointers"
+      ],
+      "difficulty": "medium",
+      "added_at": "2026-05-05"
     }
   ]
 }

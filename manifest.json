@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-05T00:00:00Z",
+  "updated_at": "2026-05-06T00:00:00Z",
   "problems": [
     {
       "slug": "two-sum",
@@ -137,6 +137,17 @@
       ],
       "difficulty": "medium",
       "added_at": "2026-05-05"
+    },
+    {
+      "slug": "rotating-the-box",
+      "leetcode_id": 1861,
+      "title_en": "Rotating the Box",
+      "pattern": [
+        "array",
+        "two-pointers"
+      ],
+      "difficulty": "medium",
+      "added_at": "2026-05-06"
     }
   ]
 }

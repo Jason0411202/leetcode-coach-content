@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-06T00:00:00Z",
+  "updated_at": "2026-05-07T00:00:00Z",
   "problems": [
     {
       "slug": "two-sum",
@@ -148,6 +148,14 @@
       ],
       "difficulty": "medium",
       "added_at": "2026-05-06"
+    },
+    {
+      "slug": "jump-game-ix",
+      "leetcode_id": 3660,
+      "title_en": "Jump Game IX",
+      "pattern": ["array", "dp"],
+      "difficulty": "medium",
+      "added_at": "2026-05-07"
     }
   ]
 }

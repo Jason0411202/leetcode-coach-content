@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-07T00:00:00Z",
+  "updated_at": "2026-05-08T00:00:00Z",
   "problems": [
     {
       "slug": "two-sum",
@@ -156,6 +156,14 @@
       "pattern": ["array", "dp"],
       "difficulty": "medium",
       "added_at": "2026-05-07"
+    },
+    {
+      "slug": "minimum-jumps-to-reach-end-via-prime-teleportation",
+      "leetcode_id": 3629,
+      "title_en": "Minimum Jumps to Reach End via Prime Teleportation",
+      "pattern": ["bfs", "hash-map", "math", "array"],
+      "difficulty": "medium",
+      "added_at": "2026-05-08"
     }
   ]
 }

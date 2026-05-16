@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-08T00:00:00Z",
+  "updated_at": "2026-05-16T00:19:19Z",
   "problems": [
     {
       "slug": "two-sum",
@@ -153,7 +153,10 @@
       "slug": "jump-game-ix",
       "leetcode_id": 3660,
       "title_en": "Jump Game IX",
-      "pattern": ["array", "dp"],
+      "pattern": [
+        "array",
+        "dp"
+      ],
       "difficulty": "medium",
       "added_at": "2026-05-07"
     },
@@ -161,9 +164,25 @@
       "slug": "minimum-jumps-to-reach-end-via-prime-teleportation",
       "leetcode_id": 3629,
       "title_en": "Minimum Jumps to Reach End via Prime Teleportation",
-      "pattern": ["bfs", "hash-map", "math", "array"],
+      "pattern": [
+        "bfs",
+        "hash-map",
+        "math",
+        "array"
+      ],
       "difficulty": "medium",
       "added_at": "2026-05-08"
+    },
+    {
+      "slug": "find-minimum-in-rotated-sorted-array-ii",
+      "leetcode_id": 154,
+      "title_en": "Find Minimum in Rotated Sorted Array II",
+      "pattern": [
+        "binary-search",
+        "array"
+      ],
+      "difficulty": "hard",
+      "added_at": "2026-05-16"
     }
   ]
 }

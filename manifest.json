@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-16T00:19:19Z",
+  "updated_at": "2026-05-17T00:00:00Z",
   "problems": [
     {
       "slug": "two-sum",
@@ -183,6 +183,18 @@
       ],
       "difficulty": "hard",
       "added_at": "2026-05-16"
+    },
+    {
+      "slug": "jump-game-iii",
+      "leetcode_id": 1306,
+      "title_en": "Jump Game III",
+      "pattern": [
+        "bfs",
+        "dfs",
+        "array"
+      ],
+      "difficulty": "medium",
+      "added_at": "2026-05-17"
     }
   ]
 }

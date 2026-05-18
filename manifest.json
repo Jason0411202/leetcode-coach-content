@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-17T00:00:00Z",
+  "updated_at": "2026-05-18T00:00:00Z",
   "problems": [
     {
       "slug": "two-sum",
@@ -195,6 +195,18 @@
       ],
       "difficulty": "medium",
       "added_at": "2026-05-17"
+    },
+    {
+      "slug": "jump-game-iv",
+      "leetcode_id": 1345,
+      "title_en": "Jump Game IV",
+      "pattern": [
+        "bfs",
+        "hash-map",
+        "array"
+      ],
+      "difficulty": "hard",
+      "added_at": "2026-05-18"
     }
   ]
 }

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-18T00:00:00Z",
+  "updated_at": "2026-05-19T00:00:00Z",
   "problems": [
     {
       "slug": "two-sum",
@@ -207,6 +207,19 @@
       ],
       "difficulty": "hard",
       "added_at": "2026-05-18"
+    },
+    {
+      "slug": "minimum-common-value",
+      "leetcode_id": 2540,
+      "title_en": "Minimum Common Value",
+      "pattern": [
+        "two-pointers",
+        "binary-search",
+        "hash-map",
+        "array"
+      ],
+      "difficulty": "easy",
+      "added_at": "2026-05-19"
     }
   ]
 }

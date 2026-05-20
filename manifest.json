@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-19T00:00:00Z",
+  "updated_at": "2026-05-20T00:13:52Z",
   "problems": [
     {
       "slug": "two-sum",
@@ -220,6 +220,18 @@
       ],
       "difficulty": "easy",
       "added_at": "2026-05-19"
+    },
+    {
+      "slug": "find-the-prefix-common-array-of-two-arrays",
+      "leetcode_id": 2657,
+      "title_en": "Find the Prefix Common Array of Two Arrays",
+      "pattern": [
+        "array",
+        "hash-map",
+        "bit-manipulation"
+      ],
+      "difficulty": "medium",
+      "added_at": "2026-05-20"
     }
   ]
 }

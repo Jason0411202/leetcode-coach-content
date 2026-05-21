@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-20T00:13:52Z",
+  "updated_at": "2026-05-21T00:15:14Z",
   "problems": [
     {
       "slug": "two-sum",
@@ -232,6 +232,19 @@
       ],
       "difficulty": "medium",
       "added_at": "2026-05-20"
+    },
+    {
+      "slug": "find-the-length-of-the-longest-common-prefix",
+      "leetcode_id": 3043,
+      "title_en": "Find the Length of the Longest Common Prefix",
+      "pattern": [
+        "array",
+        "hash-map",
+        "string",
+        "trie"
+      ],
+      "difficulty": "medium",
+      "added_at": "2026-05-21"
     }
   ]
 }

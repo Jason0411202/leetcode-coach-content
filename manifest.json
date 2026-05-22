@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-21T00:15:14Z",
+  "updated_at": "2026-05-22T00:00:00Z",
   "problems": [
     {
       "slug": "two-sum",
@@ -245,6 +245,17 @@
       ],
       "difficulty": "medium",
       "added_at": "2026-05-21"
+    },
+    {
+      "slug": "search-in-rotated-sorted-array",
+      "leetcode_id": 33,
+      "title_en": "Search in Rotated Sorted Array",
+      "pattern": [
+        "binary-search",
+        "array"
+      ],
+      "difficulty": "medium",
+      "added_at": "2026-05-22"
     }
   ]
 }

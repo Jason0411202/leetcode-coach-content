@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-23T00:00:00Z",
+  "updated_at": "2026-05-24T00:00:00Z",
   "problems": [
     {
       "slug": "two-sum",
@@ -267,6 +267,17 @@
       ],
       "difficulty": "easy",
       "added_at": "2026-05-23"
+    },
+    {
+      "slug": "jump-game-v",
+      "leetcode_id": 1340,
+      "title_en": "Jump Game V",
+      "pattern": [
+        "dp",
+        "array"
+      ],
+      "difficulty": "hard",
+      "added_at": "2026-05-24"
     }
   ]
 }

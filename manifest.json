@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-26T00:18:20Z",
+  "updated_at": "2026-05-27T00:00:00Z",
   "problems": [
     {
       "slug": "two-sum",
@@ -301,6 +301,17 @@
       ],
       "difficulty": "easy",
       "added_at": "2026-05-26"
+    },
+    {
+      "slug": "count-the-number-of-special-characters-ii",
+      "leetcode_id": 3121,
+      "title_en": "Count the Number of Special Characters II",
+      "pattern": [
+        "hash-map",
+        "string"
+      ],
+      "difficulty": "medium",
+      "added_at": "2026-05-27"
     }
   ]
 }

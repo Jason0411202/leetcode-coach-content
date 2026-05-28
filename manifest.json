@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-27T00:00:00Z",
+  "updated_at": "2026-05-28T00:00:00Z",
   "problems": [
     {
       "slug": "two-sum",
@@ -312,6 +312,18 @@
       ],
       "difficulty": "medium",
       "added_at": "2026-05-27"
+    },
+    {
+      "slug": "longest-common-suffix-queries",
+      "leetcode_id": 3093,
+      "title_en": "Longest Common Suffix Queries",
+      "pattern": [
+        "trie",
+        "string",
+        "array"
+      ],
+      "difficulty": "hard",
+      "added_at": "2026-05-28"
     }
   ]
 }

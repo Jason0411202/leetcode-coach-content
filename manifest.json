@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-30T00:19:46Z",
+  "updated_at": "2026-05-31T00:00:00Z",
   "problems": [
     {
       "slug": "two-sum",
@@ -334,6 +334,17 @@
       ],
       "difficulty": "hard",
       "added_at": "2026-05-30"
+    },
+    {
+      "slug": "destroying-asteroids",
+      "leetcode_id": 2126,
+      "title_en": "Destroying Asteroids",
+      "pattern": [
+        "greedy",
+        "array"
+      ],
+      "difficulty": "medium",
+      "added_at": "2026-05-31"
     }
   ]
 }

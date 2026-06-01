@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-31T00:00:00Z",
+  "updated_at": "2026-06-01T00:00:00Z",
   "problems": [
     {
       "slug": "two-sum",
@@ -345,6 +345,17 @@
       ],
       "difficulty": "medium",
       "added_at": "2026-05-31"
+    },
+    {
+      "slug": "minimum-cost-of-buying-candies-with-discount",
+      "leetcode_id": 2144,
+      "title_en": "Minimum Cost of Buying Candies With Discount",
+      "pattern": [
+        "greedy",
+        "array"
+      ],
+      "difficulty": "easy",
+      "added_at": "2026-06-01"
     }
   ]
 }

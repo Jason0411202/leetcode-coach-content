@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-06-02T00:00:00Z",
+  "updated_at": "2026-06-03T00:00:00Z",
   "problems": [
     {
       "slug": "two-sum",
@@ -369,6 +369,19 @@
       ],
       "difficulty": "easy",
       "added_at": "2026-06-02"
+    },
+    {
+      "slug": "earliest-finish-time-for-land-and-water-rides-ii",
+      "leetcode_id": 3635,
+      "title_en": "Earliest Finish Time for Land and Water Rides II",
+      "pattern": [
+        "array",
+        "binary-search",
+        "greedy",
+        "two-pointers"
+      ],
+      "difficulty": "medium",
+      "added_at": "2026-06-03"
     }
   ]
 }

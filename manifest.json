@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-06-03T00:00:00Z",
+  "updated_at": "2026-06-04T00:15:22Z",
   "problems": [
     {
       "slug": "two-sum",
@@ -382,6 +382,17 @@
       ],
       "difficulty": "medium",
       "added_at": "2026-06-03"
+    },
+    {
+      "slug": "total-waviness-of-numbers-in-range-i",
+      "leetcode_id": 3751,
+      "title_en": "Total Waviness of Numbers in Range I",
+      "pattern": [
+        "math",
+        "dp"
+      ],
+      "difficulty": "medium",
+      "added_at": "2026-06-04"
     }
   ]
 }

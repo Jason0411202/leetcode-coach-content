@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-06-05T00:00:00Z",
+  "updated_at": "2026-06-06T00:00:00Z",
   "problems": [
     {
       "slug": "two-sum",
@@ -404,6 +404,16 @@
       ],
       "difficulty": "hard",
       "added_at": "2026-06-05"
+    },
+    {
+      "slug": "left-and-right-sum-differences",
+      "leetcode_id": 2574,
+      "title_en": "Left and Right Sum Differences",
+      "pattern": [
+        "array"
+      ],
+      "difficulty": "easy",
+      "added_at": "2026-06-06"
     }
   ]
 }

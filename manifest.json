@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-06-09T00:00:00Z",
+  "updated_at": "2026-06-10T00:00:00Z",
   "problems": [
     {
       "slug": "two-sum",
@@ -448,6 +448,18 @@
       ],
       "difficulty": "medium",
       "added_at": "2026-06-09"
+    },
+    {
+      "slug": "maximum-total-subarray-value-ii",
+      "leetcode_id": 3691,
+      "title_en": "Maximum Total Subarray Value II",
+      "pattern": [
+        "greedy",
+        "heap",
+        "array"
+      ],
+      "difficulty": "hard",
+      "added_at": "2026-06-10"
     }
   ]
 }
